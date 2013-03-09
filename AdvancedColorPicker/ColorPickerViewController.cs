@@ -3,21 +3,21 @@
  *
  * Copyright (C) 2012 Yiannis Bourkelis
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"), to deal 
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is furnished
  * to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all 
+ *
+ * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
@@ -38,11 +38,11 @@ namespace AdvancedColorPicker
 		HueIndicatorView huewIndicatorView = new HueIndicatorView();
 		SatBrightIndicatorView satBrightIndicatorView = new SatBrightIndicatorView();
 
-		public ColorPickerViewController ()
+		public ColorPickerViewController (float hue = .5984375f, float saturation = .5f, float brightness = .7482993f)
 		{
-			satbrightview.hue = .5984375f;
-			satbrightview.saturation = .5f;
-			satbrightview.brightness = .7482993f;
+			satbrightview.hue = hue;
+			satbrightview.saturation = saturation;
+			satbrightview.brightness = brightness;
 			huewView.Hue = satbrightview.hue;
 
 			selPrevView.BackgroundColor = UIColor.FromHSB(satbrightview.hue,satbrightview.saturation,satbrightview.brightness);
@@ -82,7 +82,7 @@ namespace AdvancedColorPicker
 			huewView.AddSubview(huewIndicatorView);
 
 			satBrightIndicatorView.satBrightPickerViewRef = satbrightview;
-			PointF pos2 = new PointF(satbrightview.saturation * satbrightview.Frame.Size.Width, 
+			PointF pos2 = new PointF(satbrightview.saturation * satbrightview.Frame.Size.Width,
 			                         satbrightview.Frame.Size.Height - (satbrightview.brightness * satbrightview.Frame.Size.Height));
 			satBrightIndicatorView.Frame = new RectangleF(pos2.X - satBrightIndicatorSize.Width/2,pos2.Y-satBrightIndicatorSize.Height/2,satBrightIndicatorSize.Width,satBrightIndicatorSize.Height);
 			satBrightIndicatorView.AutoresizingMask = UIViewAutoresizing.FlexibleLeftMargin | UIViewAutoresizing.FlexibleRightMargin | UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleBottomMargin;
@@ -107,7 +107,7 @@ namespace AdvancedColorPicker
 		void PositionSatBrightIndicatorView ()
 		{
 			UIView.Animate(0.3f,0f,UIViewAnimationOptions.AllowUserInteraction, delegate() {
-				PointF pos = new PointF(satbrightview.saturation * satbrightview.Frame.Size.Width, 
+				PointF pos = new PointF(satbrightview.saturation * satbrightview.Frame.Size.Width,
 				                        satbrightview.Frame.Size.Height - (satbrightview.brightness * satbrightview.Frame.Size.Height));
 				satBrightIndicatorView.Frame = new RectangleF(pos.X - satBrightIndicatorSize.Width/2,pos.Y-satBrightIndicatorSize.Height/2,satBrightIndicatorSize.Width,satBrightIndicatorSize.Height);
 			}, delegate() {
@@ -183,7 +183,6 @@ namespace AdvancedColorPicker
 		public override bool ShouldAutorotate ()
 		{
 			return true;
-		} 
+		}
 	}
 }
-
