@@ -3,25 +3,26 @@
  *
  * Copyright (C) 2012 Yiannis Bourkelis
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"), to deal 
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is furnished
  * to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all 
+ *
+ * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,8 +32,8 @@ using AdvancedColorPicker;
 
 namespace AdvancedColorPickerDemo
 {
-	// The UIApplicationDelegate for the application. This class is responsible for launching the 
-	// User Interface of the application, as well as listening (and optionally responding) to 
+	// The UIApplicationDelegate for the application. This class is responsible for launching the
+	// User Interface of the application, as well as listening (and optionally responding) to
 	// application events from iOS.
 	[Register ("AppDelegate")]
 	public partial class AppDelegate : UIApplicationDelegate
@@ -44,9 +45,20 @@ namespace AdvancedColorPickerDemo
 		ContainerController container;
 		UIButton pickAColorBtn;
 		UINavigationController nav;
+        UILabel hsbalabel;
+        UILabel hexlabel;
+        UILabel rgbalabel;
 
+        float alpha = 1f;
+        float hue = 0f; //.5984375f;
+        float saturation = 1f; //.5f;
+        float brightness = .25f; //.7482993f;
+        float red = .5f;
+        float green = 0f;
+        float blue = 0f;
+            
 		//
-		// This method is invoked when the application has loaded and is ready to run. In this 
+		// This method is invoked when the application has loaded and is ready to run. In this
 		// method you should instantiate the window, load the UI into it and then make the window
 		// visible.
 		//
@@ -59,31 +71,48 @@ namespace AdvancedColorPickerDemo
 
 			container = new ContainerController();
 			nav = new UINavigationController(container);
-
+            hsbalabel = new UILabel() {
+                Frame = new RectangleF(0f,0f,UIScreen.MainScreen.Bounds.Width, 40f),
+//                BackgroundColor = UIColor.White,
+//                TextColor = UIColor.Black
+};
+            hexlabel = new UILabel() {
+                Frame = new RectangleF(0f,40f,UIScreen.MainScreen.Bounds.Width, 40f),
+//                BackgroundColor = UIColor.White,
+//                TextColor = UIColor.Black
+};
+            rgbalabel = new UILabel() {
+                Frame = new RectangleF(0f,80f,UIScreen.MainScreen.Bounds.Width, 40f),
+//                BackgroundColor = UIColor.White,
+//                TextColor = UIColor.Black
+};
 			pickAColorBtn = UIButton.FromType(UIButtonType.RoundedRect);
 			pickAColorBtn.Frame = new System.Drawing.RectangleF(UIScreen.MainScreen.Bounds.Width/2 - 50,UIScreen.MainScreen.Bounds.Height/2 - 22,100,44);
 			pickAColorBtn.AutoresizingMask = UIViewAutoresizing.FlexibleMargins;
 			pickAColorBtn.SetTitle("Pick a color!",UIControlState.Normal);
 			pickAColorBtn.TouchUpInside += pickAColorBtn_HandleTouchUpInside;
 			container.View.AddSubview(pickAColorBtn);
-
+            container.View.AddSubview(hsbalabel);
+            container.View.AddSubview(hexlabel);
+            container.View.AddSubview(rgbalabel);
+            container.View.BackgroundColor = UIColor.FromRGB (red,blue,green);
 			window.RootViewController = nav;
-	
+            SetText();
 			// make the window visible
 			window.MakeKeyAndVisible ();
-			
+
 			return true;
 		}
 
 		UIBarButtonItem doneBtn;
 		void pickAColorBtn_HandleTouchUpInside (object sender, EventArgs e)
 		{
-			picker = new ColorPickerViewController();
+			picker = new ColorPickerViewController(hue,saturation,brightness);
 			picker.ColorPicked += HandleColorPicked;
 			picker.Title = "Pick a color!";
 			UINavigationController pickerNav = new UINavigationController(picker);
 			pickerNav.ModalPresentationStyle = UIModalPresentationStyle.FormSheet;
-	
+
 			doneBtn = new UIBarButtonItem(UIBarButtonSystemItem.Done);
 			picker.NavigationItem.RightBarButtonItem = doneBtn;
 			doneBtn.Clicked += doneBtn_HandleClicked;
@@ -99,7 +128,36 @@ namespace AdvancedColorPickerDemo
 		void HandleColorPicked ()
 		{
 			container.View.BackgroundColor = picker.SelectedColor;
+            picker.SelectedColor.GetHSBA(out hue, out saturation, out brightness, out alpha);
+            picker.SelectedColor.GetRGBA(out red, out green, out blue, out alpha);
+            Console.WriteLine(hsba());
+            Console.WriteLine(rgba());
+            Console.WriteLine(hexl());
+            SetText ();
 		}
-	}
-}
 
+        string hsba() {
+            return string.Format("h={0} s={1} b={2} a={3}", hue, saturation, brightness, alpha);
+        }
+
+        string rgba() {
+            return string.Format("r={0} g={1} b={2}",
+                                 Convert.ToInt32(255*red),
+                                 Convert.ToInt32(255*green),
+                                 Convert.ToInt32(255*blue));
+        }
+
+        string hexl() {
+            return string.Format("#{0:x2}{1:x2}{2:x2}",
+                                 Convert.ToInt32(255*red),
+                                 Convert.ToInt32(255*green),
+                                 Convert.ToInt32(255*blue));
+        }
+        
+        void SetText() {
+            hsbalabel.Text=hsba();
+            rgbalabel.Text=rgba();
+            hexlabel.Text=hexl ();
+        }
+    }
+}
